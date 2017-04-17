@@ -9,5 +9,6 @@ import {
   AppRegistry,
 } from 'react-native';
 import Calculator from './calculator'
+import SimpleTransitionApp from './SimpleTransitionApp'
 
-AppRegistry.registerComponent('RNPlayground', () => Calculator);
+AppRegistry.registerComponent('RNPlayground', () => SimpleTransitionApp);

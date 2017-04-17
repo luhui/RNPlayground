@@ -3,6 +3,11 @@
 - [前言](#前言)
 - [核心思想](#核心思想)
 - [从一个需求开始](#从一个需求开始)
+	- [前后端分离](#前后端分离)
+	- [页面实现](#页面实现)
+	- [页面跳转](#页面跳转)
+		- [最简单的页面跳转](#最简单的页面跳转)
+		- [react-native-router-flux](#react-native-router-flux)
 
 <!-- /TOC -->
 # 前言
@@ -17,7 +22,99 @@ react-native是基于前端框架[React](https://facebook.github.io/react/)派�
 
 代码中的[calculator.js](./calculator.js)是一个简单的+1计算器，大家可以对比传统使用Android或者iOS编写这个demo时的实现思路。
 
+```js
+
+export default class Calculator extends Component {
+  constructor() {
+    super()
+    this.state = {
+      count: 0
+    }
+  }
+  render() {
+    return (
+      <View style={styles.container}>
+        <Button
+          style={styles.instructions}
+          title={"点击+1"}
+          onPress={() => {
+            this.setState({count: this.state.count + 1})
+          }} />
+        <Text style={styles.welcome}>
+          {"结果: " + this.state.count}
+        </Text>
+      </View>
+    )
+  }
+}
+
+```
+
 # 从一个需求开始
 
 大部分移动应用，登录注册是必不可少的，而这个简单的功能，承载了界面实现、界面跳转、网络请求、数据库存储等方方面面。
 因此，我们从这个小需求出发，思考一个移动端的架构是如何设计成型的，管中窥豹。
+
+我们大致的一个功能逻辑大概会是这样：
+
+认证首页（包含登录、注册按钮） -> 注册/登录页 -> 注册/登录成功 -> 首页 -> 登出 -> 认证首页
+
+## 前后端分离
+
+首先，我们应该先明确一个前提，我们应该尽可能的模块化，使前后端分离。这样的好处是方便维护，并且易于分工。
+
+接下来的实现，我们都会基于这个原则，针对每一个单独的功能模块进行开发
+
+## 页面实现
+
+页面设计会包含性能优化、布局技巧、动画等等，主题庞大，这里我们先暂且略过，以最简单的页面实现功能需求。
+
+我们先按照功能逻辑实现几个简单的界面，包括
+
+[AuthMain.js](./AuthMain.js) -- 认证首页  
+[Login.js](./Login.js) -- 登陆页  
+[Register.js](./Register.js) -- 注册页  
+[Main.js](./Main.js) -- 首页  
+
+
+## 页面跳转
+
+### 最简单的页面跳转
+
+页面，本质上就是一个全屏的Component，页面跳转实际上就是根据业务需求，显示不同的Component罢了，因此在最简单的情况下，我们可以设计一个庞大的Component，这个Component里根据state的page来决定渲染哪个子Component
+
+[SimpleTransitionApp.js](./SimpleTransitionApp.js)就是按照上述的原则实现的简单页面
+
+```js
+export default class SimpleTransitionApp extends Component {
+  constructor() {
+    super()
+    this.state = {
+      page: 'authMain'
+    }
+  }
+  render() {
+    let page = (
+      <AuthMain
+        showLogin={() => this.setState({page: 'login'})}
+        showRegister={() => this.setState({page: 'register'})}/>
+    )
+    switch (this.state.page) {
+      case 'login':
+        page = <Login login={() => this.setState({page: 'main'})} />
+        break
+      case 'register':
+        page = <Regisger register={() => this.setState({page: 'main'})} />
+        break
+      case 'main':
+        page = <Main logout={() => this.setState({page: 'authMain'})} />
+      default:
+    }
+    return (
+      <View style={styles.container}>
+        {page}
+      </View>
+    )
+  }
+}
+```
