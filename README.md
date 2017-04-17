@@ -118,3 +118,50 @@ export default class SimpleTransitionApp extends Component {
   }
 }
 ```
+
+### react-native-router-flux
+
+随着应用越来越复杂（例如实现导航栏、页面返回、tab、侧边栏等），我们就必须把页面跳转的逻辑抽离开来，单独实现一系列的机制来为复杂的业务模型提供页面跳转框架，就如iOS里的`UINavigationController`、Android里的`Activity`、`Task机制`一样，为了解决在RN中的页面跳转问题，涌现除了许多跳转框架。在众众多的跳转框架中，我们选择了[react-native-router-flux](https://github.com/aksonov/react-native-router-flux)，他使用到了Facebook提出的`flux`思想，和后续选用的`redux`配合起来效果较好，对于常用的跳转控制也都支持，这是选中这个框架的原因。
+
+***作者是fork了一个旧的`ExperimentalNavigation`，在这个基础上封装了基于`flux`的跳转控制，由于这个`ExperimentalNavigation`官方已经停止维护，转用[ReactNavigation](https://reactnavigation.org/)，而作者对于PR的处理也很慢，因此后续可能会改用`ReactNavigation`。***
+
+[RouterFluxApp.js](./RouterFluxApp.js)是一个使用该框架的示例。
+
+```js
+export default class RouterFluxApp extends Component {
+  render() {
+
+    return (
+      <Router>
+        <Scene key='auth'>
+          <Scene key='authMain' component={() => this.getPage('authMain')} />
+          <Scene key='login' component={() => this.getPage('login')} />
+          <Scene key='register' component={() => this.getPage('register')} />
+        </Scene>
+        <Scene key='main' component={() => this.getPage('main')} />
+      </Router>
+    )
+  }
+
+  getPage(key) {
+    let page = (
+      <AuthMain
+        showLogin={() => Actions.login()}
+        showRegister={() => Actions.register()}/>
+    )
+    switch (key) {
+      case 'login':
+        page = <Login login={() => Actions.main({type: 'reset'})} />
+        break
+      case 'register':
+        page = <Regisger register={() => Actions.main({type: 'reset'})} />
+        break
+      case 'main':
+        page = <Main logout={() => Actions.auth({type: 'reset'})} />
+      default:
+    }
+    return page
+  }
+}
+```
+对比[SimpleTransitionApp.js](./SimpleTransitionApp.js)的代码可以看出，我们只是把跟入口的配置给改变了，并没有改变Component的代码，这就是React通过组件化实现前后端分离带来的好处

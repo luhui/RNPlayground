@@ -10,5 +10,6 @@ import {
 } from 'react-native';
 import Calculator from './calculator'
 import SimpleTransitionApp from './SimpleTransitionApp'
+import RouterFluxApp from './RouterFluxApp'
 
-AppRegistry.registerComponent('RNPlayground', () => SimpleTransitionApp);
+AppRegistry.registerComponent('RNPlayground', () => RouterFluxApp);
